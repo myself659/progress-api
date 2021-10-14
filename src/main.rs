@@ -68,6 +68,11 @@ impl<Iter> ProgressIteratorExt for Iter {
 }
 
 fn main() {
+
+    // for  n in (0 .. ).progress().with_bound() {
+    //     expensive_calculation(n);
+    // }
+
     let v: Vec<i32> = vec![1,2,3];
     for n in v.iter().progress().with_bound() {
         expensive_calculation(n);
