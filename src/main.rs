@@ -3,12 +3,21 @@ const CLEAR: &str = "\x1B[2J\x1B[1;1H";
 
 struct Progress<Iter> {
     iter: Iter,
-    i: usize
+    i: usize,
+    bound: Option<usize>
 }
 
 impl <Iter> Progress<Iter> {
     pub fn new(iter: Iter) -> Self {
-        Progress { iter: iter, i: 0 }
+        Progress { iter: iter, i: 0, bound: None }
+    }
+}
+
+impl <Iter> Progress<Iter>
+where Iter: ExactSizeIterator {
+    pub fn with_bound(mut self) -> Self {
+        self.bound = Some(self.iter.len() as usize);
+        self
     }
 }
 
@@ -17,7 +26,18 @@ where Iter: Iterator {
     type Item =Iter::Item;
 
     fn next(&mut self) -> Option<Self::Item> {
-        println!("{}{}", CLEAR, "*".repeat(self.i));
+        println!("{}",CLEAR);
+        match self.bound {
+            Some(bound) => {
+                println!("[{}{}]", "*".repeat(self.i), " ".repeat(bound -self.i));
+            },
+            None => {
+                println!("{}", "*".repeat(self.i));
+            }
+        }
+
+
+
         self.i += 1;
         self.iter.next()
     }
@@ -49,7 +69,7 @@ impl<Iter> ProgressIteratorExt for Iter {
 
 fn main() {
     let v: Vec<i32> = vec![1,2,3];
-    for n in v.iter().progress() {
+    for n in v.iter().progress().with_bound() {
         expensive_calculation(n);
     }
     // for n in Progress::new(v.iter()){
