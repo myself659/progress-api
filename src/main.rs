@@ -37,11 +37,24 @@ fn expensive_calculation(_n: &i32) {
     sleep(Duration::from_secs(1));
 }
 
+trait ProgressIteratorExt:Sized {
+    fn progress(self) -> Progress<Self>;
+}
+
+impl<Iter> ProgressIteratorExt for Iter {
+    fn  progress(self)->Progress<Self>{
+        Progress::new(self)
+    }
+}
+
 fn main() {
     let v: Vec<i32> = vec![1,2,3];
-    for n in Progress::new(v.iter()){
+    for n in v.iter().progress() {
         expensive_calculation(n);
     }
+    // for n in Progress::new(v.iter()){
+    //     expensive_calculation(n);
+    // }
     // progress(v.iter(), expensive_calculation);
 
     // println!("----------");
